@@ -5,8 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "build:lib": "babel src --out-dir lib",
-    "build:umd": "cross-env NODE_ENV=development webpack src/index.js dist/refar.js",
-    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/refar.min.js",
+    "build:umd": "cross-env NODE_ENV=development webpack src/index.js dist/rx-store.js",
+    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/rx-store.min.js",
     "build": "npm run build:lib && npm run build:umd && npm run build:umd:min && node ./prepublish",
     "clean": "rimraf lib dist coverage",
     "lint": "eslint src test",
