@@ -1,0 +1,85 @@
+{
+  "name": "rx-store",
+  "version": "0.1.0",
+  "description": "Redux style store library with Rx for React",
+  "main": "lib/index.js",
+  "scripts": {
+    "build:lib": "babel src --out-dir lib",
+    "build:umd": "cross-env NODE_ENV=development webpack src/index.js dist/refar.js",
+    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/refar.min.js",
+    "build": "npm run build:lib && npm run build:umd && npm run build:umd:min && node ./prepublish",
+    "clean": "rimraf lib dist coverage",
+    "lint": "eslint src test",
+    "prepublish": "npm run clean && npm run build",
+    "test": "mocha --compilers js:babel-register --recursive --require ./test/setup.js",
+    "test:watch": "npm test -- --watch",
+    "test:cov": "babel-node ./node_modules/isparta/bin/isparta cover ./node_modules/mocha/bin/_mocha -- --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FourSS/rx-store.git"
+  },
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "keywords": [
+    "rx",
+    "rxjs",
+    "react",
+    "reactjs",
+    "store",
+    "redux",
+    "rx-redux"
+  ],
+  "author": "Almas Akchabayev <almas.akchabayev@gmail.com> (https://github.com/almasakchabayev)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FourSS/rx-store/issues"
+  },
+  "homepage": "https://github.com/FourSS/rx-store#readme",
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.11.4",
+    "babel-eslint": "^6.1.2",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.9.0",
+    "cross-env": "^2.0.0",
+    "es3ify": "^0.2.2",
+    "eslint": "^3.1.1",
+    "eslint-config-rackt": "^1.1.1",
+    "eslint-plugin-react": "^5.2.2",
+    "expect": "^1.20.2",
+    "glob": "^7.0.5",
+    "isparta": "^4.0.0",
+    "istanbul": "^0.4.4",
+    "jsdom": "^9.4.1",
+    "mocha": "^2.5.3",
+    "react": "^15.2.1",
+    "react-addons-test-utils": "^15.2.1",
+    "react-dom": "^15.2.1",
+    "rimraf": "^2.5.3",
+    "rxjs": "^5.0.0-beta.10",
+    "webpack": "^1.13.1"
+  },
+  "dependencies": {
+    "hoist-non-react-statics": "^1.2.0",
+    "invariant": "^2.2.1",
+    "lodash": "^4.13.1",
+    "loose-envify": "^1.2.0"
+  },
+  "peerDependencies": {
+    "react": "^15.2.1",
+    "rxjs": "^5.0.0-beta.10"
+  },
+  "browserify": {
+    "transform": [
+      "loose-envify"
+    ]
+  }
+}
