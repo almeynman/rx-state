@@ -1,7 +1,7 @@
 {
-  "name": "rx-store-minimal-example",
+  "name": "rx-state-minimal-example",
   "version": "1.0.0",
-  "description": "Hello World implementation with RxStore (Rx + React)",
+  "description": "Hello World implementation with RxState (Rx + React)",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

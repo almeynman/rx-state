@@ -1,4 +1,4 @@
-RxStore
+RxState
 =========================
 
 The library uses the similar to Redux, but it uses Rx to achieve top down
@@ -6,10 +6,10 @@ unidirectional data flow
 
 ## Installation
 
-RxStore requires **React 0.15 or later.** and **Rxjs 5.0**
+RxState requires **React 0.15 or later.** and **Rxjs 5.0**
 
 ```
-npm install --save rx-store
+npm install --save rx-state
 ```
 
 Works with react-native out of the box
