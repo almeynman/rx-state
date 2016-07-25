@@ -10,7 +10,7 @@ describe('Utils', () => {
       const wrapped = wrapActionNames({
         doSomething: 'hello'
       }, actionFactory)
-      expect(wrapped.doSomething).toBeA(Subject)
+      expect(wrapped.doSomething).toBeA(Function)
     })
   })
 })

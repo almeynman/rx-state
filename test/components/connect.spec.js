@@ -130,7 +130,7 @@ describe('React', () => {
 
       const stub = TestUtils.findRenderedComponentWithType(tree, Passthrough)
       expect(stub.props.counter).toBe(0)
-      expect(stub.props.increment).toBeA(Subject)
+      expect(stub.props.increment).toBeA(Function)
       actionFactory.get('increment').next(1)
       expect(stub.props.counter).toBe(1)
       actionFactory.get('increment').next(1)
