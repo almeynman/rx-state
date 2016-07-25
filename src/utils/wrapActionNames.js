@@ -1,5 +1,7 @@
+import _ from 'lodash'
+
 export default function wrapActionNames(actionNames, actions) {
   const result = {}
-  actionNames.mapKeys(key => result[key] = actionNames[key] ? actions.get(actionNames[key]) : actions.get(key))
+  _.forIn(actionNames, (value, key) => result[key] = value ? actions.get(value) : actions.get(key))
   return result
 }

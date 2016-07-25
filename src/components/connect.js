@@ -96,7 +96,6 @@ function connect(mapStateToProps, mapDispatchToProps, mergeProps, options = {}) 
       }
 
       componentWillReceiveProps(nextProps) {
-        console.log(this.wrappedComponent)
         if (!pure || (mapState.length !== 1 && this.state)) {
           this.state.storeState = mapState(this.state.storeState, nextProps)
         }
