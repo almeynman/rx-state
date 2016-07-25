@@ -1,0 +1,25 @@
+RxStore
+=========================
+
+The library uses the similar to Redux, but it uses Rx to achieve top down
+unidirectional data flow
+
+## Installation
+
+RxStore requires **React 0.15 or later.** and **Rxjs 5.0**
+
+```
+npm install --save rx-store
+```
+
+Works with react-native out of the box
+
+
+The library is inspired by http://michalzalecki.com/use-rxjs-with-react/.
+However I have added Provider component and ActionFactory
+
+
+Usage
+=========================
+
+For Usage please check examples folder
