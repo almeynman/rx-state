@@ -1,5 +1,4 @@
 import expect from 'expect'
-import { Subject } from 'rxjs/Subject'
 import wrapActionNames from '../../src/utils/wrapActionNames'
 import { ActionFactory } from '../../src'
 
@@ -10,6 +9,14 @@ describe('Utils', () => {
       const wrapped = wrapActionNames({
         doSomething: 'hello'
       }, actionFactory)
+      expect(wrapped.doSomething).toBeA(Function)
+    })
+
+    it('should return an object with bounded actions if array is passed', () => {
+      const actionFactory = new ActionFactory
+      const wrapped = wrapActionNames([
+        'doSomething'
+      ], actionFactory)
       expect(wrapped.doSomething).toBeA(Function)
     })
   })

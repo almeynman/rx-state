@@ -16,7 +16,8 @@ export default connect(
   state => ({
     name: state.name
   }),
-  { updateName: 'updateName' } // shortcut for below
+  [ 'updateName' ] // shortcut for below
+  // { updateName: 'updateName' } // shortcut for below
   // actionFactory => ({
   //   updateName: name => actionFactory.get('updateName').next(name)
   // })
