@@ -1,5 +1,7 @@
-export default function wrapActionNames(actionNames, actions) {
-  const result = {}
-  actionNames.mapKeys(key => result[key] = actionNames[key] ? actions.get(actionNames[key]) : actions.get(key))
-  return result
+import _ from 'lodash'
+
+export default function wrapActionNames(actionNames, actionFactory) {
+  return _.transform(actionNames, (result, value, key) => {
+    result[key] = value ? actionFactory.get(value) : actionFactory.get(key)
+  }, {})
 }

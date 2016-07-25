@@ -1,192 +1,70 @@
-import { Component, createElement } from 'react'
-import invariant from 'invariant'
-import hoistStatics from 'hoist-non-react-statics'
-import isPlainObject from 'lodash/isPlainObject'
-import warning from '../utils/warning'
+import React from 'react'
+import shallowCompare from 'react-addons-shallow-compare'
 import storeShape from '../utils/storeShape'
-import shallowEqual from '../utils/shallowEqual'
+import actionFactoryShape from '../utils/actionFactoryShape'
 import wrapActionNames from '../utils/wrapActionNames'
 
 import { map } from 'rxjs/operator/map'
 
-const defaultMapStateToProps = () => ({})
-const defaultMapDispatchToProps = dispatch => ({ dispatch })
-const defaultMergeProps = (stateProps, dispatchProps, parentProps) => ({
-  ...parentProps,
-  ...stateProps,
-  ...dispatchProps
-})
-
-function getDisplayName(WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component'
-}
-
-// Helps track hot reloading.
-let nextVersion = 0
-
-function connect(mapStateToProps, mapDispatchToProps, mergeProps, options = {}) {
-  const shouldSubscribe = Boolean(mapStateToProps)
-  const mapState = mapStateToProps || defaultMapStateToProps
-  let mapDispatch
-
-  const finalMergeProps = mergeProps || defaultMergeProps
+function connect(mapState = state => ({}), mapActions = actions => ({}), mergeProps, options = {}) {
   const { pure = true, withRef = false } = options
-
-  // Helps track hot reloading.
-  const version = nextVersion++
-
   return function wrapWithConnect(WrappedComponent) {
-    const connectDisplayName = `Connect(${getDisplayName(WrappedComponent)})`
-
-    function checkStateShape(props, methodName) {
-      if (!isPlainObject(props)) {
-        warning(
-          `${methodName}() in ${connectDisplayName} must return a plain object. ` +
-          `Instead received ${props}.`
-        )
-      }
-    }
-
-    function computeMergedProps(stateProps, dispatchProps, parentProps) {
-      const mergedProps = finalMergeProps(stateProps, dispatchProps, parentProps)
-      if (process.env.NODE_ENV !== 'production') {
-        checkStateShape(mergedProps, 'mergeProps')
-      }
-      return mergedProps
-    }
-
-    class Connect extends Component {
-      static displayName = connectDisplayName
-      static WrappedComponent = WrappedComponent
-
+    return class Connect extends React.Component {
       static propTypes = {
-        store: storeShape
+        store: storeShape,
+        actionFactory: actionFactoryShape
       }
 
       static contextTypes = {
-        store: storeShape.isRequired
+        store: storeShape.isRequired,
+        actionFactory: actionFactoryShape
       }
 
       constructor(props, context) {
         super(props, context)
-        this.store = props.store || context.store
-
-        invariant(this.store,
-          'Could not find "store" in either the context or ' +
-          'props of "${connectDisplayName}". ' +
-          'Either wrap the root component in a <Provider>, ' +
-          'or explicitly pass "store" as a prop to "${connectDisplayName}".'
-        )
-
-        if (typeof mapDispatchToProps === 'function') {
-          mapDispatch = mapDispatchToProps
-        } else if (!mapDispatchToProps) {
-          mapDispatch = defaultMapDispatchToProps
+        this.store = context.store
+        this.actionFactory = context.actionFactory
+        if (typeof mapActions === 'function') {
+          this.actions = mapActions(this.actionFactory)
         } else {
-          mapDispatch = wrapActionNames(mapDispatchToProps, this.store.actions)
+          this.actions = wrapActionNames(mapActions, this.actionFactory)
         }
-
-        this.state = { storeState: {} }
       }
 
       componentWillMount() {
-        this.actions = mapDispatch(this.store.dispatch, this.props)
-        this.actionsUpdated = true
-        this.trySubscribe()
-      }
-
-      componentWillReceiveProps(nextProps) {
-        console.log(this.wrappedComponent)
-        if (!pure || (mapState.length !== 1 && this.state)) {
-          this.state.storeState = mapState(this.state.storeState, nextProps)
-        }
-
-        if (!pure || (mapDispatch.length !== 1 && !this.actionsUpdated)) {
-          this.actions = mapDispatch(this.store.dispatch, nextProps)
-          this.actionsUpdated = true
-        }
+        this.subscription = this.store::map(mapState).subscribe(
+          state => this.setState(state)
+        )
       }
 
       shouldComponentUpdate(nextProps, nextState) {
-        return !pure || !shallowEqual(this.props, nextProps) ||
-          !shallowEqual(this.state.storeState, nextState.storeState)
+        return pure && shallowCompare(this, nextProps, nextState)
       }
 
       componentWillUnmount() {
-        if (this.subscription) {
-          this.subscription.unsubscribe()
-        }
-      }
-
-      trySubscribe() {
-        if (shouldSubscribe && !this.subscription) {
-          this.subscription = this.store::map(subState => mapState(subState, this.props)).subscribe(
-            state => this.setState({ storeState: state })
-          )
-        }
-        if (mapDispatch.length !== 1 && !this.actionsUpdated) {
-          this.actions = mapDispatch(this.store.dispatch, this.props)
-          this.actionsUpdated = true
-        }
-      }
-
-      isSubscribed() {
-        return !!this.subscription
-      }
-
-      getWrappedInstance() {
-        invariant(withRef,
-          'To access the wrapped instance, you need to specify ' +
-          '{ withRef: true } as the fourth argument of the connect() call.'
-        )
-
-        return this.wrappedInstance
+        this.subscription.unsubscribe()
       }
 
       render() {
-        this.actionsUpdated = false
-
-        if (process.env.NODE_ENV !== 'production') {
-          checkStateShape(this.state.storeState, 'mapStateToProps')
-        }
-
-        if (process.env.NODE_ENV !== 'production') {
-          checkStateShape(this.actions, 'mapDispatchToProps')
-        }
-
-        const mergedProps = computeMergedProps(
-          this.state.storeState ? this.state.storeState : {},
-          this.actions,
-          this.props
-        )
-
         if (withRef) {
-          this.renderedElement = createElement(WrappedComponent, {
-            ...mergedProps,
-            ref: instance => this.wrappedInstance = instance
-          })
-        } else {
-          this.renderedElement = createElement(WrappedComponent, {
-            ...mergedProps
-          })
+          return (
+            <WrappedComponent
+              ref={el => this.component = el}
+              {...this.props}
+              {...this.actions}
+              {...this.state}
+            />
+          )
         }
-
-        return this.renderedElement
+        return (
+          <WrappedComponent
+            {...this.props}
+            {...this.actions}
+            {...this.state}
+          />
+        )
       }
     }
-
-    if (process.env.NODE_ENV !== 'production') {
-      Connect.prototype.componentWillUpdate = function componentWillUpdate() {
-        if (this.version === version) {
-          return
-        }
-        // We are hot reloading!
-        this.version = version
-        this.trySubscribe()
-      }
-    }
-
-    return hoistStatics(Connect, WrappedComponent)
   }
 }
 

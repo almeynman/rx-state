@@ -1,4 +1,5 @@
 import { Subject } from 'rxjs/Subject'
+import _ from 'lodash'
 
 export default class ActionFactory {
   actions = {}
@@ -15,6 +16,6 @@ export default class ActionFactory {
   }
 
   list(regex) {
-    return Object.keys(this.actions).filter(actionName => actionName.match(regex))
+    return _.keys(this.actions).filter(actionName => actionName.match(regex))
   }
 }
